@@ -151,10 +151,6 @@ cd .\terraform; $vpc=(terraform output -raw vpc_id); aws ec2 describe-vpcs --vpc
 aws ec2 describe-subnets --filters Name=vpc-id,Values=$vpc --query "Subnets[].[SubnetId,CidrBlock,MapPublicIpOnLaunch]" --output table
 ```
 
----
-
-# 6) Screenshot checklist (what/where)
-
 * **Terraform CLI**:
 
   * `terraform output` (full)
