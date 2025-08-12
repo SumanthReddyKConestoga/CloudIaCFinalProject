@@ -1,24 +1,27 @@
-# Terraform
+# ---- Terraform state & cache ----
 .terraform/
 terraform.tfstate
 terraform.tfstate.backup
 *.tfstate
 *.tfstate.*
 crash.log
+.terraform.lock.hcl
+*.tfplan
+
+# ---- Ignore all tfvars by default ----
 *.tfvars
 *.auto.tfvars
-override.tf
-override.tf.json
-.terraform.lock.hcl
+
+# ---- ALLOWLIST for rubric (must be AFTER *.tfvars rules) ----
+!terraform/terraform.tfvars
+!terraform/terraform.tfvars.example
+
+# ---- Scripts that may contain secrets (never commit) ----
+scripts/set-aws-env.ps1
 set-aws-env.ps1
 
-# OS/editor
+# ---- OS/editor cruft ----
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-
-*.tfvars
-*.auto.tfvars
-scripts/set-aws-env.ps1
-
