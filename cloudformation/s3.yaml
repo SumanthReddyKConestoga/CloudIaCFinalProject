@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Create 3 Private S3 Buckets with PublicAccessBlockConfiguration + Versioning'
+
+Parameters:
+  BucketAName: { Type: String }
+  BucketBName: { Type: String }
+  BucketCName: { Type: String }
+
+Resources:
+  BucketA:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketAName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration: { Status: Enabled }
+      Tags: [{ Key: Purpose, Value: CloudFormation-S3 }]
+
+  BucketB:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketBName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration: { Status: Enabled }
+
+  BucketC:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketCName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration: { Status: Enabled }
+
+Outputs:
+  BucketAOut: { Value: !Ref BucketA }
+  BucketBOut: { Value: !Ref BucketB }
+  BucketCOut: { Value: !Ref BucketC }

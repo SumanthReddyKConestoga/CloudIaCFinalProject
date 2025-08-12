@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'EC2 in a new VPC with IGW, route table, public subnet, SSH SG, public IP output'
+
+Parameters:
+  AmiId:         { Type: String, Description: AMI ID }
+  InstanceType:  { Type: String, Default: t3.micro }
+  KeyName:       { Type: String, Default: "" }
+  VpcCidr:       { Type: String, Default: 10.60.0.0/16 }
+  PublicSubnetCidr: { Type: String, Default: 10.60.1.0/24 }
+  AllowSshCidr:  { Type: String, Default: 0.0.0.0/0 }
+
+Conditions:
+  UseKey: !Not [ !Equals [ !Ref KeyName, "" ] ]
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags: [{ Key: Name, Value: cf-ec2-vpc }]
+
+  IGW:
+    Type: AWS::EC2::InternetGateway
+
+  AttachIgw:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: { VpcId: !Ref VPC, InternetGatewayId: !Ref IGW }
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnetCidr
+      MapPublicIpOnLaunch: true
+      Tags: [{ Key: Name, Value: cf-ec2-public-1a }]
+
+  PublicRT:
+    Type: AWS::EC2::RouteTable
+    Properties: { VpcId: !Ref VPC }
+
+  DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRT
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW
+
+  AssocPublic:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: { RouteTableId: !Ref PublicRT, SubnetId: !Ref PublicSubnet }
+
+  EC2SG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 22, ToPort: 22, CidrIp: !Ref AllowSshCidr }
+
+  EC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          AssociatePublicIpAddress: true
+          SubnetId: !Ref PublicSubnet
+          GroupSet: [!Ref EC2SG]
+      KeyName: !If [ UseKey, !Ref KeyName, !Ref "AWS::NoValue" ]
+      Tags: [{ Key: Name, Value: cf-ec2-instance }]
+
+Outputs:
+  PublicIp:
+    Description: Public IP of EC2
+    Value: !GetAtt EC2.PublicIp
