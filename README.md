@@ -1,7 +1,3 @@
-Absolutely, Sumanth. Here’s the **lean, no-nonsense README**: only what matters, zero config dumps, heavy on **commands**, and explicit **screenshot** capture guidance. Use it as your repo README or as your submission playbook.
-
----
-
 # CloudIaCFinalProject — Operator Runbook
 
 This project deploys **S3, EC2, RDS** on AWS using **Terraform** (private RDS) and **CloudFormation** (public RDS). Follow this runbook end-to-end for your demo and evidence.
